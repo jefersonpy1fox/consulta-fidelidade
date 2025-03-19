@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: url('https://i.postimg.cc/qqZWSqJK/Whats-App-Image-2025-03-19-at-10-35-13.jpg') no-repeat center center fixed;
+        background-size: cover;
+        background-color: #f4f4f4;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        position: relative;
+        filter: brightness(1.1) contrast(1.2) saturate(1.5);
+      }
+      body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.6);
+        z-index: 1;
+      }
+      .container {
+        max-width: 400px;
+        width: 100%;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+      h2 {
+        color: #2575fc;
+        margin-bottom: 20px;
+      }
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #2575fc;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      button:hover {
+        background: #6a11cb;
+      }
+      .result {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f4f4f4;
+        border-radius: 5px;
+        color: #333;
+        text-align: left;
+      }
+      .congrats {
+        color: #2575fc;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .incentive {
+        color: #6a11cb;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+      .info {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Consulta Fidelidade</h2>
+      <p class="info">Digite seu número de telefone com DDD:</p>
+      <input type="text" id="phone" placeholder="Ex: 11999999999" required>
+      <button onclick="search()">CONSULTAR</button>
+      <div id="result" class="result"></div>
+    </div>
+    <script>
+      function search() {
+        const phone = document.getElementById('phone').value;
+        if (!phone) {
+          alert('Por favor, digite seu telefone com DDD.');
+          return;
+        }
+        // Chama a função do Google Apps Script
+        google.script.run
+          .withSuccessHandler(showResult)
+          .withFailureHandler((error) => {
+            alert('Erro ao consultar. Tente novamente.');
+            console.error(error);
+          })
+          .searchClient(phone);
+      }
+
+      function showResult(data) {
+        const resultDiv = document.getElementById('result');
+        if (data) {
+          let congratsMessage = '';
+          let incentiveMessage = '';
+          
+          if (data.status === 'Desconto Liberado') {
+            congratsMessage = '<p class="congrats">🎉 Parabéns! Você ganhou 50% de desconto no próximo pedido! 🎉</p>';
+          } else {
+            incentiveMessage = `<p class="incentive">🚀 Falta(m) apenas ${data.proximoDesconto} pedido(s) para você ganhar 50% de desconto! Continue assim!</p>`;
+          }
+
+          resultDiv.innerHTML = `
+            ${congratsMessage}
+            ${incentiveMessage}
+            <p><strong>Nome:</strong> ${data.nome}</p>
+            <p><strong>Pedidos Realizados:</strong> ${data.pedidos}</p>
+            <p><strong>Próximo Desconto:</strong> ${data.proximoDesconto} pedidos restantes</p>
+            <p><strong>Status:</strong> ${data.status}</p>
+          `;
+        } else {
+          resultDiv.innerHTML = '<p>Nenhum cliente encontrado com esse telefone.</p>';
+        }
+      }
+    </script>
+    <!-- Inclui o script do Google Apps Script -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+  </body>
+</html>
